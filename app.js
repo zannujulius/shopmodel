@@ -9,9 +9,19 @@ const mongoose = require('mongoose')
 const errorController = require('./controllers/error');
 const app = express();
 const port = 3000;
+const session = require('express-session')
+const MongoDBStore = require('connect-mongodb-session')(session)
 
+const MONGODB_URI = 'mongodb://localhost:27017/Shop'
+
+const store = new MongoDBStore({
+    // connect string to store string
+    uri: MONGODB_URI,
+    //where you want your session to be stured
+    collection: 'session' 
+})
 mongoose.connect(
-    'mongodb://localhost:27017/Shop',{ useNewUrlParser: true ,  useUnifiedTopology: true , useFindAndModify: false}
+    MONGODB_URI, { useNewUrlParser: true ,  useUnifiedTopology: true , useFindAndModify: false}
     )
 .then(result => {
     User.findOne()
@@ -37,13 +47,32 @@ app.set('views', 'views');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth')
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+//initialization if session
+app.use(session({
+    // for signin the hash to store an ID in
+    // cookie
+    secret: 'super-password',
+    // the cookie will not be saved on every session
+    // only change when there is a change int he session 
+    resave: false,
+    // ensure that no seesion is saved foir where
+    // it doesnt need to be saved
+    saveUninitialized:false,
+    //to initialize mongodb store
+    store: store
+}))
 
 app.use((req, res, next) => {
-    User.findById('5f1f3b3a1f196e2f44697f3b')
+    if(!req.session.user){
+        return next();
+    }
+    User.findById(req.session.user._id)
     .then(user => {
+        //creating a user bsased on the session user
         req.user = user;
         next();
     })
@@ -52,6 +81,8 @@ app.use((req, res, next) => {
   
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
+
 
 app.use(errorController.get404);
 

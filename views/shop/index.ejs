@@ -6,6 +6,7 @@
     <%- include('../includes/navigation.ejs') %>
 
     <main>
+       
         <% if (prods.length > 0) { %>
             <div class="grid">
                 <% for (let product of prods) { %>
@@ -27,6 +28,7 @@
                                     <%- include('../includes/add-to-cart.ejs', {product: product}) %>
                                 <% } %> 
                         </div> 
+                    </article>
                 <% } %>
             </div>
         <% } else { %>

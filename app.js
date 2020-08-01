@@ -11,36 +11,26 @@ const app = express();
 const port = 3000;
 const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
-
 const MONGODB_URI = 'mongodb://localhost:27017/Shop'
+// const csrf = require('csurf')
+const flash = require('connect-flash')
 
 const store = new MongoDBStore({
-    // connect string to store string
     uri: MONGODB_URI,
-    //where you want your session to be stured
-    collection: 'session' 
-})
+    collection: 'sessions'
+});
+
+
+
 mongoose.connect(
     MONGODB_URI, { useNewUrlParser: true ,  useUnifiedTopology: true , useFindAndModify: false}
     )
 .then(result => {
-    User.findOne()
-    .then(user => {
-        if(!user){
-            const user = new User({
-                name: 'Julius',
-                email: 'zannujulius14@gmail.com',
-                cart: {
-                    items: []
-                }
-            })
-            user.save().then(() => console.log('User created!!!')).catch(err => console.log(err))
-        }
-        console.log('Mongoose Connected!!!')
-    })
+    console.log('Mongoose Connected!!!')
 })
 .catch(err => console.log(err))
 
+// const csrfProtection = csrf();
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -57,7 +47,7 @@ app.use(session({
     // cookie
     secret: 'super-password',
     // the cookie will not be saved on every session
-    // only change when there is a change int he session 
+    // only change when there is a change in the session 
     resave: false,
     // ensure that no seesion is saved foir where
     // it doesnt need to be saved
@@ -65,6 +55,8 @@ app.use(session({
     //to initialize mongodb store
     store: store
 }))
+
+app.use(flash())
 
 app.use((req, res, next) => {
     if(!req.session.user){
@@ -78,11 +70,15 @@ app.use((req, res, next) => {
     })
     .catch(err => console.log(err))
 })
-  
+
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLoggedIn
+    next()
+})
+
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
-
 
 app.use(errorController.get404);
 

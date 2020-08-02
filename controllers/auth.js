@@ -12,11 +12,14 @@ const mailGun = require('nodemailer-mailgun-transport');
 
 const {validationResult } = require('express-validator')
 
+//use the dotenv code
+require('dotenv').config();
+
 // athurizationation used by mail gun
 const auth = {
   auth: {
-    api_key: '3d61cc940aab19bf4cfed965edd58943-9dda225e-2236b2f2',
-    domain: 'sandbox765612441952487991a157e58bc6a7d1.mailgun.org'
+    api_key: process.env.API_KEY,
+    domain:  process.env.API_DOMAIN
   }
 }
 

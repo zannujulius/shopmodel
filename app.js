@@ -14,6 +14,10 @@ const MongoDBStore = require('connect-mongodb-session')(session)
 const MONGODB_URI = 'mongodb://localhost:27017/Shop'
 // const csrf = require('csurf')
 const flash = require('connect-flash')
+// use the dotenv npm to hide secret keys
+require('dotenv').config();
+
+// console.log(process.env)
 
 const store = new MongoDBStore({
     uri: MONGODB_URI,

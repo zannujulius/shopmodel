@@ -240,11 +240,12 @@ form {
   padding:0.5rem;
   border-radius:3px;
   text-align:center;
+  color:red;
 }
 
 .user-message{
   border-color:red;
-  background-color: rgb(240, 145, 145);
+  background-color: rgb(238, 187, 187);
 }
 
 @media (min-width: 768px) {

@@ -14,7 +14,6 @@
     "nodemon": "^1.19.4"
   },
   "dependencies": {
-    "-": "0.0.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "connect-flash": "^0.1.1",
@@ -24,6 +23,7 @@
     "express": "^4.17.1",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.17.1",
+    "express-validator": "^6.6.0",
     "mongodb": "^3.5.9",
     "mongoose": "^5.9.25",
     "mysql2": "^2.1.0",

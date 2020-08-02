@@ -10,6 +10,8 @@ const nodemailer = require('nodemailer')
 const mailGun = require('nodemailer-mailgun-transport');
 // const sendgridTransport = require('nodemailer-sendgrid-transport')
 
+const {validationResult } = require('express-validator')
+
 // athurizationation used by mail gun
 const auth = {
   auth: {
@@ -131,16 +133,28 @@ exports.postSignup = (req, res, next) => {
   const password = req.body.password;
    // take the confirmed user password from the sign up form
   const confirmPassword = req.body.confirmPassword;
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    // erroe statting that user input validation failed
+    // then render is used to redner the same poge again
+    // console.log(errors.array())
+    return res.status(422).render('auth/signup', {
+      path: '/signup',
+      pageTitle: 'Signup',
+      // used to return an array of errors
+      errorMessage: errors.array()[0].msg
+    });
+  }
   // find out if the email already exist 
   // console.log(email, password)
-  User.findOne({email: email})
-  .then(userDoc => {
-    // the user email already exists iun the data
-    if (userDoc){
-      // flash an error if a user already exists 
-      req.flash('error', 'Email is already taken by another user')
-      return res.redirect('/signup')
-    }
+  // User.findOne({email: email})
+  // .then(userDoc => {
+  //   // the user email already exists iun the data
+  //   if (userDoc){
+  //     // flash an error if a user already exists 
+  //     req.flash('error', 'Email is already taken by another user')
+  //     return res.redirect('/signup')
+  //   }
     // encrypt the password 
     //bcrypt take two values th
     // the password and the hash value
@@ -149,7 +163,7 @@ exports.postSignup = (req, res, next) => {
     
     // if we dont have an already existing user 
     // hash the users password
-    return bcrypt.hash(password, 12)
+    bcrypt.hash(password, 12)
     .then(hashedPassword => {
       // create a new us
      const user  = new User({
@@ -170,10 +184,6 @@ exports.postSignup = (req, res, next) => {
     //     html: '<h1>you successfully signed up</h1>'
     //   })
    })
-   .catch(err => {
-     console.log(err)
-   })
-  })
   .catch(err => console.log(err))
 }
 
